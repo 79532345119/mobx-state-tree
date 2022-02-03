@@ -1,25 +1,31 @@
-import logo from './logo.svg';
 import './App.css';
+import { observer } from 'mobx-react-lite';
+import { getSnapshot } from 'mobx-state-tree';
+import { values } from 'mobx';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = (props) => {
+    console.log(getSnapshot(props.store))
+    const idCreator = () => {
+      return Date.now().toString()
+    }
+    const addUser = () => {
+      props.store.addUser(idCreator(), "New one")
+    }
 
-export default App;
+    return (
+      <div className="App">
+        <button onClick={e =>addUser()}>Add user</button>
+        <div>
+          {props.store.usersCount}
+        </div>
+        { values(props.store.users).map((user, i) => <div key={i}>
+          <div>{user.name}</div>
+          <div>{user.userTodoCount}</div>
+          <button onClick={e => user.addTodo(idCreator())}>Добавить туду</button>
+        </div>)}
+      </div>
+    );
+  }
+ 
+
+export default observer(App);
